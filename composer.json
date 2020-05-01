@@ -1,0 +1,22 @@
+{
+    "name": "militer/mvc",
+    "type": "library",
+    "description": "MILITER`s mini mvc",
+    "keywords": ["php", "mvc"],
+    "homepage": "https://github.com/htmlcssjspro/mvc",
+    "license": "GPL-3.0-or-later",
+    "authors": [{
+        "name": "Sergei MILITER Tarasov",
+        "email": "militer@htmlcssjs.pro",
+        "homepage": "https://htmlcssjs.pro",
+        "role": "Developer"
+    }],
+    "require": {
+        "php": ">=7.4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Militer": "src"
+        }
+    }
+}
