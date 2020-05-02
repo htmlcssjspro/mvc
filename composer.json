@@ -1,5 +1,5 @@
 {
-    "name": "militer/mvc",
+    "name": "militer/mvc-core",
     "type": "library",
     "description": "MILITER`s mini mvc",
     "keywords": ["php", "mvc"],
@@ -16,7 +16,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Militer\\mvc\\": "src"
+            "Militer\\mvc-core\\": "src"
         }
     }
 }
