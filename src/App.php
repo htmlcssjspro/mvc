@@ -2,22 +2,13 @@
 
 namespace Militer\mvcCore;
 
+use Militer\mvcCore\DI\Container;
+use Militer\mvcCore\Interfaces\iRouter;
+
 class App
 {
-    protected $instances = [];
-
-    public function __construct()
+    public static function start()
     {
-        \Militer\devCore\Debug::newClassInstance(__CLASS__); // Удалить в production.  // Для разработки самого фреймворка
-    }
-
-    public function getInstance($name)
-    {
-        return static::$instances[$name];
-    }
-
-    public function setInstance($name, $value)
-    {
-        static::$instances[$name] = $value;
+        $Router = Container::get(iRouter::class);
     }
 }

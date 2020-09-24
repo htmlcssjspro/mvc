@@ -2,42 +2,33 @@
 
 namespace Militer\mvcCore;
 
-use Militer\mvcCore\Interfaces\iContainer;
+use Militer\mvcCore\DI\Container;
+use Militer\mvcCore\Interfaces\iDB;
 
-class DB
+class DB implements iDB
 {
     private static $pdo = null;
 
-    private static $db = [];
+    private static $dbConfig = [];
 
-    public function __construct(array $db)
+    public function __construct()
     {
-        \Militer\devCore\Debug::newClassInstance(__CLASS__); // Удалить в production.  // Для разработки самого фреймворка
-
-        self::$db = $db;
-        self::connect();
+        self::$dbConfig = Container::get('dbConfig');
     }
 
-    private static function connect()
+    public static function connect()
     {
-        return self::$pdo ?? self::newConnect(self::$db);
+        return self::$pdo ?? self::newConnect(self::$dbConfig);
     }
 
-    private static function newConnect(array $db)
+    private static function newConnect(array $dbConfig)
     {
-        \extract($db);
+        \extract($dbConfig);
         return self::$pdo = new \PDO(
             "$driver:host=$host; dbname=$name; charset=utf8",
             $username,
             $password,
             $pdo_options
         );
-        // OR :
-        // return self::$pdo = new \PDO(
-        //     "{$db['driver']}:host={$db['host']}; dbname={$db['name']}; charset=utf8",
-        //     $db['$username'],
-        //     $db['$password'],
-        //     $db['$pdo_options']
-        // );
     }
 }

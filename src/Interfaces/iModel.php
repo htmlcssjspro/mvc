@@ -2,6 +2,6 @@
 
 namespace Militer\mvcCore\Interfaces;
 
-interface iRouter
+interface iModel
 {
 }
