@@ -2,8 +2,15 @@
 
 namespace Militer\mvcCore\Http\Response;
 
+
 class Response implements iResponse
 {
+    public string $header = '';
+    public array  $headers = [];
+
+    public $body = null;
+    public $code = 200;
+
     private $httpStatusCodes = [
         100 => "Continue",
         101 => "Switching Protocols",
@@ -77,14 +84,37 @@ class Response implements iResponse
         510 => "Not Extended",
         511 => "Network Authentication Required",
         598 => "Network read timeout error",
-        599 => "Network connect timeout error"
+        599 => "Network connect timeout error",
     ];
 
-    public $header = '';
-    public $headers = [];
-    public $body = null;
-    public $code = 200;
 
+    public function sendJson($array)
+    {
+        $encodeOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE;
+        $json = \json_encode($array, $encodeOptions);
+        $this->header = 'Content-type: application/json';
+        $this->body = $json;
+        $this->send();
+    }
+
+    public function sendHtml($data)
+    {
+        $this->header = 'Content-type: text/html;charset=UTF-8';
+        $this->body = $data;
+        $this->send();
+    }
+
+    public function sendText($data)
+    {
+        $this->header = 'Content-type: text/plain;charset=UTF-8';
+        $this->body = $data;
+        $this->send();
+    }
+
+    public function sendOK()
+    {
+        $this->send();
+    }
 
     public function notFound()
     {
@@ -93,32 +123,15 @@ class Response implements iResponse
         $this->send();
     }
 
-    public function sendJson($array)
+    public function badRequest()
     {
-        $encodeOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE;
-        $json = \json_encode($array, $encodeOptions);
-        $this->headers = ['Content-type: application/json'];
-        $this->body = $json;
-        $this->send();
-    }
-
-    public function sendHtml($data)
-    {
-        $this->headers = ['Content-type: text/html'];
-        $this->body = $data;
-        $this->send();
-    }
-
-    public function sendText($data)
-    {
-        $this->headers = ['Content-type: text/plain'];
-        $this->body = $data;
-        $this->send();
-    }
-
-    public function sendOK()
-    {
-        $this->send();
+        $this->code = 400;
+        $array = [
+            'error' => [
+                'message' => 'Bad Request'
+            ]
+        ];
+        $this->sendJson($array);
     }
 
     public function send()

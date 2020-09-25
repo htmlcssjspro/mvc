@@ -7,7 +7,6 @@ use Militer\mvcCore\Interfaces\iModel;
 
 abstract class Model implements iModel
 {
-    public $pdo;
 
     public string $title;
     public string $description;
@@ -18,16 +17,14 @@ abstract class Model implements iModel
     public string $aside;
     public string $mainContent;
 
-    // public $layoutCSS;
     public string $mainCSS;
     public string $mainJS;
     public array $pageCSS = [];
     public array $pageJS = [];
 
-    public $data = [];
+    public array $data = [];
 
-    public $code = 200;
-    public $headers = [];
+    protected $pdo;
 
     protected $sitemapTable = \SITEMAP_TABLE;
     protected $usersTable = \USERS_TABLE;

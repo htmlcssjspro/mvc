@@ -4,27 +4,31 @@ namespace Militer\mvcCore;
 
 use Militer\mvcCore\DI\Container;
 use Militer\mvcCore\Interfaces\iController;
+use Militer\mvcCore\Interfaces\iCsrf;
 use Militer\mvcCore\Interfaces\iView;
 use Militer\mvcCore\Interfaces\iUser;
 
 abstract class Controller implements iController
 {
-    public $model;
-    public $user;
-    // public $view;
-    private $view;
+    public $User;
+    public $Csrf;
+    public $Model;
+
+    private $View;
 
 
     public function __construct()
     {
-        $this->view  = Container::get(iView::class);
-        $this->user  = Container::get(iUser::class);
+        $this->User = Container::get(iUser::class);
+        $this->Csrf = Container::get(iCsrf::class);
+        $this->View = Container::get(iView::class);
     }
 
 
     public function render()
     {
-        $this->view->render($this->model);
+        $this->Model->getPageData($this->pageTextId);
+        $this->View->render($this->Model);
     }
 
     abstract public function index();

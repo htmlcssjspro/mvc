@@ -2,7 +2,7 @@
     "name": "militer/mvc-core",
     "type": "library",
     "description": "micro-mvc-framework для проекта composer militer/militer Движок веб-сайта с микро-mvc-фреймворком и микро-cms",
-    "homepage": "https://github.com/htmlcssjspro/mvc",
+    "homepage": "https://github.com/htmlcssjspro/mvc-core",
     "keywords": ["militer", "php", "mvc"],
     "license": "GPL-3.0-or-later",
     "authors": [{

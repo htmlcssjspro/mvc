@@ -7,8 +7,8 @@ use Militer\mvcCore\Interfaces\iUser;
 
 abstract class User implements iUser
 {
-    public $pdo;
-    protected $userTable = \USERS_TABLE;
+    protected $pdo;
+    protected $usersTable = \USERS_TABLE;
 
 
     public function __construct()
