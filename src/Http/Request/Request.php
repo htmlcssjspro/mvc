@@ -26,6 +26,11 @@ class Request implements iRequest
         return $request['path'];
     }
 
+    public function getQuery(): string
+    {
+        return \urldecode($_SERVER['QUERY_STRING']);
+    }
+
     public function getGET(): array
     {
         return $_GET;

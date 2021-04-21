@@ -1,6 +1,6 @@
 <?php
 
-namespace Militer\mvcCore\DI\Interfaces;
+namespace Militer\mvcCore\DI;
 
 interface iContainer
 {

@@ -123,15 +123,26 @@ class Response implements iResponse
         $this->send();
     }
 
+    public function notFoundPage()
+    {
+        $this->code = 404;
+        $this->header = "Location: {$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}/404";
+        $this->send();
+    }
+
     public function badRequest()
     {
         $this->code = 400;
         $array = [
-            'error' => [
-                'message' => 'Bad Request'
-            ]
+            'message' => 'Bad Request'
         ];
         $this->sendJson($array);
+    }
+
+    public function homePage()
+    {
+        $this->header = "Location: {$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}/";
+        $this->send();
     }
 
     public function send()

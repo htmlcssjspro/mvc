@@ -2,8 +2,7 @@
 
 namespace Militer\mvcCore\DI;
 
-use Militer\mvcCore\DI\Exception\ContainerException;
-use Militer\mvcCore\DI\Interfaces\iContainer;
+use Militer\mvcCore\Exception\ContainerException;
 
 class Container implements iContainer
 {

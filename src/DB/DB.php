@@ -1,14 +1,12 @@
 <?php
 
-namespace Militer\mvcCore;
+namespace Militer\mvcCore\DB;
 
 use Militer\mvcCore\DI\Container;
-use Militer\mvcCore\Interfaces\iDB;
 
 class DB implements iDB
 {
     private static $pdo = null;
-
     private static $dbConfig = [];
 
     public function __construct()

@@ -3,7 +3,7 @@
 namespace Militer\mvcCore;
 
 use Militer\mvcCore\DI\Container;
-use Militer\mvcCore\Interfaces\iRouter;
+use Militer\mvcCore\Router\iRouter;
 
 class App
 {

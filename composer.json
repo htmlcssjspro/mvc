@@ -1,7 +1,7 @@
 {
     "name": "militer/mvc-core",
     "type": "library",
-    "description": "micro-mvc-framework для проекта composer militer/militer Движок веб-сайта с микро-mvc-фреймворком и микро-cms",
+    "description": "micro-mvc-framework для проекта composer militer/militer-project",
     "homepage": "https://github.com/htmlcssjspro/mvc-core",
     "keywords": ["militer", "php", "mvc"],
     "license": "GPL-3.0-or-later",
@@ -11,7 +11,7 @@
         "homepage": "https://htmlcssjs.pro",
         "role": "Developer"
     }],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
             "Militer\\mvcCore\\": "src"

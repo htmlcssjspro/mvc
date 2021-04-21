@@ -1,11 +1,9 @@
 <?php
 
-// declare(strict_types=1);
 
 namespace Militer\mvcCore\Exception;
 
-// class UserException extends \ErrorException
-class UserException
+class CustomException
 {
 
     private static $errors = [
