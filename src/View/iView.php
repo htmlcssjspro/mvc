@@ -6,5 +6,7 @@ use Militer\mvcCore\Model\iModel;
 
 interface iView
 {
-    public function render(iModel $Model);
+    public static function renderPage($page);
+    public static function renderMain($main);
+    public static function renderNotFound();
 }

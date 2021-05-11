@@ -8,7 +8,6 @@ class Container implements iContainer
 {
 
     private static $container = [];
-    private static $singletones = [];
 
 
     private function __construct()
@@ -31,53 +30,33 @@ class Container implements iContainer
         }
     }
 
-    public static function get($name, $parameters = [])
+    public static function get($name, $parameter = NULL)
     {
-        // if we don't have it, just register it
-        if (!isset(self::$container[$name])) {
-            self::set($name);
+        !isset(self::$container[$name]) && self::set($name);
+        $concrete = self::$container[$name];
+        if ($concrete instanceof \Closure) {
+            return $parameter ? $concrete($parameter) : $concrete();
         }
-
-        return self::resolve(self::$container[$name], $parameters);
+        return self::resolve($concrete);
     }
 
-    private static function resolve($concrete, $parameters)
+    private static function resolve($concrete)
     {
-        if ($concrete instanceof \Closure) {
-            return $concrete(new self, $parameters);
-        }
-
-        if (isset(self::$singletones[$concrete])) {
-            return self::$singletones[$concrete];
-        }
-
         $reflector = new \ReflectionClass($concrete);
         if ($reflector->isInterface()) {
             throw new ContainerException("Interface {$concrete} has no implementation");
         }
-        // check if class is instantiable
         if (!$reflector->isInstantiable()) {
             throw new ContainerException("Class {$concrete} is not instantiable");
         }
-        // get class constructor
+
         $constructor = $reflector->getConstructor();
         if (is_null($constructor)) {
-            // get new instance from class
-            if ($reflector->hasProperty('isSingletone')) {
-                self::$singletones[$concrete] = $reflector->newInstance();
-                return self::$singletones[$concrete];
-            }
             return $reflector->newInstance();
         }
-        // get constructor params
+
         $parameters   = $constructor->getParameters();
         $dependencies = self::getDependencies($parameters);
-        // get new instance with dependencies resolved
-
-        if ($reflector->hasProperty('isSingletone')) {
-            self::$singletones[$concrete] = $reflector->newInstanceArgs($dependencies);
-            return self::$singletones[$concrete];
-        }
 
         return $reflector->newInstanceArgs($dependencies);
     }
@@ -86,22 +65,17 @@ class Container implements iContainer
     {
         $dependencies = [];
         foreach ($parameters as $parameter) {
-            // get the type hinted class
-            $dependency = $parameter->getClass();
+            $dependency = $parameter->getType()->getName();
             if ($dependency === NULL) {
-                // check if default value for a parameter is available
                 if ($parameter->isDefaultValueAvailable()) {
-                    // get default value of parameter
                     $dependencies[] = $parameter->getDefaultValue();
                 } else {
-                    throw new \Exception("Can not resolve class dependency '{$parameter->name}'");
+                    throw new ContainerException("Cannot resolve class dependency '{$parameter->name}'");
                 }
             } else {
-                // get dependency resolved
-                $dependencies[] = self::get($dependency->name);
+                $dependencies[] = self::get($dependency);
             }
         }
         return $dependencies;
     }
-
 }

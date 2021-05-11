@@ -2,14 +2,12 @@
 
 namespace Militer\mvcCore\Controller;
 
-use Core\Csrf\iCsrf;
-use Core\User\iUser;
+use Militer\mvcCore\Csrf\iCsrf;
 use Militer\mvcCore\DI\Container;
+use Militer\mvcCore\User\iUser;
 
 abstract class aController implements iController
 {
-    public $Model;
-
     protected $User;
     protected $Csrf;
     protected $config;
@@ -17,10 +15,11 @@ abstract class aController implements iController
 
     public function __construct()
     {
-        $this->User = Container::get(iUser::class);
-        $this->Csrf = Container::get(iCsrf::class);
+        $this->User   = Container::get(iUser::class);
+        $this->Csrf   = Container::get(iCsrf::class);
         $this->config = Container::get('config');
     }
 
 
+    abstract public function index(array $routerData);
 }

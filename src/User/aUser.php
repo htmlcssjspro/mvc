@@ -2,40 +2,39 @@
 
 namespace Militer\mvcCore\User;
 
-use Militer\mvcCore\DI\Container;
+use Militer\mvcCore\Model\aModel;
 
-abstract class aUser implements iUser
+abstract class aUser extends aModel implements iUser
 {
-    protected $PDO;
-    protected $usersTable;
-    private $config;
 
 
     public function __construct()
     {
-        $this->PDO = Container::get('pdo');
-        $this->config = Container::get('config');
-        $this->usersTable = $this->config['dbTables']['users'];
+        parent::__construct();
     }
 
 
-    protected function generatePassword($length = 8)
+    public function generatePassword($length = 8)
     {
         $length = $length > 8 ? $length : 8;
         $charsArr = [
             'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
             'abcdefghijklmnopqrstuvwxyz',
             '0123456789',
-            '!@$%&?',
         ];
+        $symbols = '!@$%^&?*()';
         $password = '';
+        function random($string){
+            return $string[\random_int(0, \mb_strlen($string) - 1)];
+        }
         foreach ($charsArr as $chars) {
-            $password .= $chars[\random_int(0, \mb_strlen($chars) - 1)];
+            $password .= random($chars);
         }
-        while (\mb_strlen($password) < $length) {
+        while (\mb_strlen($password) < $length - 1) {
             $chars = $charsArr[\random_int(0, \count($charsArr) - 1)];
-            $password .= $chars[\random_int(0, \mb_strlen($chars) - 1)];
+            $password .= random($chars);
         }
+        $password .= random($symbols);
         return \str_shuffle($password);
     }
 }

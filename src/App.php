@@ -9,6 +9,6 @@ class App
 {
     public static function start()
     {
-        $Router = Container::get(iRouter::class);
+        Container::get(iRouter::class);
     }
 }

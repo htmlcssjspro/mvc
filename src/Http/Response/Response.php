@@ -8,7 +8,9 @@ class Response implements iResponse
     public string $header = '';
     public array  $headers = [];
 
-    public $body = null;
+    public $body     = null;
+    public $response = null;
+
     public $code = 200;
 
     private $httpStatusCodes = [
@@ -88,31 +90,9 @@ class Response implements iResponse
     ];
 
 
-    public function sendJson($array)
+    public function homePage()
     {
-        $encodeOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE;
-        $json = \json_encode($array, $encodeOptions);
-        $this->header = 'Content-type: application/json';
-        $this->body = $json;
-        $this->send();
-    }
-
-    public function sendHtml($data)
-    {
-        $this->header = 'Content-type: text/html;charset=UTF-8';
-        $this->body = $data;
-        $this->send();
-    }
-
-    public function sendText($data)
-    {
-        $this->header = 'Content-type: text/plain;charset=UTF-8';
-        $this->body = $data;
-        $this->send();
-    }
-
-    public function sendOK()
-    {
+        $this->header = "Location: {$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}/";
         $this->send();
     }
 
@@ -133,17 +113,63 @@ class Response implements iResponse
     public function badRequest()
     {
         $this->code = 400;
-        $array = [
-            'message' => 'Bad Request'
-        ];
-        $this->sendJson($array);
-    }
-
-    public function homePage()
-    {
-        $this->header = "Location: {$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}/";
+        $this->body = \file_get_contents(\PAGE_400);
         $this->send();
     }
+
+    public function badRequestPage()
+    {
+        $this->code = 400;
+        $this->header = "Location: {$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}/400";
+        $this->send();
+    }
+
+    public function badRequestMessage()
+    {
+        $this->code = 400;
+        $this->response['message'] = 'Bad Request';
+        $this->sendResponse();
+    }
+
+
+    public function sendHtml($html)
+    {
+        $this->header = 'Content-type: text/html;charset=UTF-8';
+        $this->body = $html;
+        $this->send();
+    }
+
+    public function sendText($data)
+    {
+        $this->header = 'Content-type: text/plain;charset=UTF-8';
+        $this->body = $data;
+        $this->send();
+    }
+
+
+    public function sendJson($array)
+    {
+        $encodeOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE;
+        $json = \json_encode($array, $encodeOptions);
+        $this->header = 'Content-type: application/json';
+        $this->body = $json;
+        $this->send();
+    }
+
+
+    public function sendResponse()
+    {
+        if ($this->response !== null) {
+            $this->sendJson($this->response);
+        }
+    }
+
+
+    public function sendOK()
+    {
+        $this->send();
+    }
+
 
     public function send()
     {

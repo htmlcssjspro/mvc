@@ -2,48 +2,75 @@
 
 namespace Militer\mvcCore\Router;
 
+use Admin\Controllers\AdminApiController;
+use Admin\Controllers\AdminController;
+use Main\Controllers\MainApiController;
+use Main\Controllers\MainController;
 use Militer\mvcCore\DI\Container;
 use Militer\mvcCore\Http\Request\iRequest;
-use Militer\mvcCore\Http\Response\iResponse;
 
 class Router implements iRouter
 {
-    private $Request;
-    private $Response;
-    private $PDO;
-    private $config;
 
 
-    public function __construct(iRequest $Request, iResponse $Response)
+    private function __construct()
     {
-        $this->Request  = $Request;
-        $this->Response = $Response;
-        $this->PDO = Container::get('pdo');
-        $this->config = Container::get('config');
-
-        $this->dispatch();
     }
 
 
-    private function dispatch()
+    public static function init()
     {
-        $requestUri = $this->Request->getRequestUri();
-        $sitemap_table = $this->config['dbTables']['sitemap'];
-        $sql = "SELECT `controller`, `action` FROM $sitemap_table WHERE `page_url`=? LIMIT 1";
-        $pdostmt = $this->PDO->prepare($sql);
-        $pdostmt->execute([$requestUri]);
-        $page = $pdostmt->fetch();
+        $Request  = Container::get(iRequest::class);
 
-        if (!$page) {
-            $this->Response->notFound();
+        $method     = $Request->getMethod();
+        $requestUri = $Request->getRequestUri();
+        // $query      = $Request->getQuery();
+
+        $admin    = '/admin/';
+        $adminApi = '/admin/api/';
+        $api      = '/api/';
+
+        $parameters = [
+            'method' => $method,
+            'requestUri' => $requestUri,
+            // 'query' => $query,
+        ];
+
+
+
+        $reg = function ($exp) use ($requestUri) {
+            return \mb_eregi("^$exp", $requestUri);
+        };
+        $params = function ($exp) use (&$parameters, $requestUri) {
+            $parameters['controller'] = trim($exp, '/');
+            $action = \mb_eregi_replace("^$exp", '', $requestUri);
+            $array = \explode('/', $action);
+            $parameters['action'] = $array[0];
+            $parameters['query'] = !empty($array[1]) ? \mb_eregi_replace("^{$array[0]}/", '', $action) : '';
+            $parameters['hash'] = '';
+        };
+
+
+        if ($reg($admin)) {
+            // if ($method === 'post' && $reg($adminApi)) {
+            if ($reg($adminApi)) {
+                $params($adminApi);
+                $Controller = AdminApiController::class;
+            } else {
+                $params($admin);
+                $Controller = AdminController::class;
+            }
+            // } elseif ($method === 'post' && $reg($api)) {
+        } elseif ($reg($api)) {
+            $params($api);
+            $Controller = MainApiController::class;
+        } else {
+            $params('/');
+            $Controller = MainController::class;
         }
 
-        $controller = $page['controller'];
-        $action     = $page['action'] ?? 'index';
 
-        $controller = Container::get("App\Controllers\\$controller");
-        $query = $this->Request->getQuery();
-        $query ? $controller->$action($query) : $controller->$action();
+        $Controller = Container::get($Controller);
+        $Controller->index($parameters);
     }
-
 }
