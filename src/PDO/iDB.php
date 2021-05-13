@@ -1,6 +1,6 @@
 <?php
 
-namespace Militer\mvcCore\DB;
+namespace Militer\mvcCore\PDO;
 
 interface iDB
 {

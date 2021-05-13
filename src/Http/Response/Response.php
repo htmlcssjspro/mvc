@@ -9,7 +9,7 @@ class Response implements iResponse
     public array  $headers = [];
 
     public $body     = null;
-    public $response = null;
+    // public $response = null;
 
     public $code = 200;
 
@@ -127,8 +127,8 @@ class Response implements iResponse
     public function badRequestMessage()
     {
         $this->code = 400;
-        $this->response['message'] = 'Bad Request';
-        $this->sendResponse();
+        $response['message'] = 'Bad Request';
+        $this->sendJson($response);
     }
 
 
@@ -139,29 +139,25 @@ class Response implements iResponse
         $this->send();
     }
 
-    public function sendText($data)
+    public function sendText($text)
     {
         $this->header = 'Content-type: text/plain;charset=UTF-8';
-        $this->body = $data;
+        $this->body = $text;
         $this->send();
     }
 
-
-    public function sendJson($array)
+    public function sendJson($response)
     {
         $encodeOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE;
-        $json = \json_encode($array, $encodeOptions);
+        $json = \json_encode($response, $encodeOptions);
         $this->header = 'Content-type: application/json';
         $this->body = $json;
         $this->send();
     }
 
-
-    public function sendResponse()
-    {
-        if ($this->response !== null) {
-            $this->sendJson($this->response);
-        }
+    public function sendMessage(string $message){
+        $response['message'] = $message;
+        $this->sendJson($response);
     }
 
 
@@ -171,7 +167,7 @@ class Response implements iResponse
     }
 
 
-    public function send()
+    private function send()
     {
         $protocol = $_SERVER['SERVER_PROTOCOL'] ?? 'HTTP/2';
         $text = $this->httpStatusCodes[$this->code];

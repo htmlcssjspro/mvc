@@ -47,7 +47,8 @@ class Container implements iContainer
             throw new ContainerException("Interface {$concrete} has no implementation");
         }
         if (!$reflector->isInstantiable()) {
-            throw new ContainerException("Class {$concrete} is not instantiable");
+            return $reflector->getName();
+            // throw new ContainerException("Class {$concrete} is not instantiable");
         }
 
         $constructor = $reflector->getConstructor();

@@ -2,11 +2,13 @@
 
 namespace Militer\mvcCore\Model;
 
+use Militer\mvcCore\DB\iPDO;
 use Militer\mvcCore\DI\Container;
 
 abstract class aModel implements iModel
 {
-    protected $PDO;
+    protected iPDO $PDO;
+    protected \PDO $pdo;
     protected $config;
     protected string $mainSitemapTable  = 'main_sitemap';
     protected string $mainLayoutsTable  = 'main_layouts';
@@ -18,14 +20,8 @@ abstract class aModel implements iModel
 
     protected function __construct()
     {
-        $this->PDO = Container::get('pdo');
+        $this->PDO = Container::get('PDO');
+        $this->pdo = Container::get('pdo');
         $this->config = Container::get('config');
-        // $dbTables = $this->config['dbTables'];
-        // $this->mainSitemapTable  = $dbTables['mainSitemap'];
-        // $this->mainLayoutsTable  = $dbTables['mainLayouts'];
-        // $this->mainSectionsTable = $dbTables['mainSections'];
-        // $this->adminSitemapTable = $dbTables['adminSitemap'];
-        // $this->usersTable = $dbTables['users'];
-        // $this->adminTable = $dbTables['admin'];
     }
 }

@@ -12,18 +12,26 @@ abstract class aApiController extends aController
     protected $Response;
 
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->Request  = Container::get(iRequest::class);
         $this->Response = Container::get(iResponse::class);
-        $this->methodVerify();
+        // $this->methodVerify();
     }
 
 
-    protected function sendMessage(string $messages, bool $result)
+    public function index(array $routerData)
     {
-        $messages = Container::get('messages')[$messages];
-        $message = $result ? $messages['success'] : $messages['error'];
+        $method = $routerData['method'];
+        $this->methodVerify($method);
+    }
+
+    protected function sendMessage(string $messages, bool|string $index)
+    {
+        $messages = Container::get('messages', $messages);
+        \is_bool($index)   && $message = $index ? $messages['success'] : $messages['error'];
+        \is_string($index) && $message = $messages[$index];
         $this->Response->sendJson($message);
     }
 
@@ -36,7 +44,7 @@ abstract class aApiController extends aController
             $this->filterInput($postData);
             $callback($postData);
         } else {
-            $this->Response->badRequest();
+            $this->Response->badRequestPage();
         }
     }
 
@@ -104,7 +112,7 @@ abstract class aApiController extends aController
                 $message = "Неожиданная ошибка загрузки файла <strong>{$file['name']}</strong>";
                 break;
         }
-        $this->Response->sendJson($message);
+        $this->Response->sendMessage($message);
     }
 
     private function reArrayFILES($files)
@@ -117,9 +125,9 @@ abstract class aApiController extends aController
         return $reFiles;
     }
 
-    private function methodVerify()
+    protected function methodVerify(string $method)
     {
-        $method = $this->Request->getMethod();
-        $method !== 'post' && $this->Response->notFound();
+        // $method = $this->Request->getMethod();
+        $method !== 'post' && $this->Response->notFoundPage();
     }
 }
