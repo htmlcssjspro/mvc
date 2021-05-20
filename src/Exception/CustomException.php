@@ -30,10 +30,8 @@ class CustomException
     ];
 
 
-    public function __construct()
+    private function __construct()
     {
-        \set_error_handler([self::class, 'errorHandler'], E_ALL);
-        \set_exception_handler([self::class, 'exceptionHandler']);
     }
 
 
@@ -46,7 +44,7 @@ class CustomException
 
     public static function errorHandler($code, $message, $file, $line)
     {
-        $severity = E_ALL;
+        $severity = \E_ALL;
         throw new \ErrorException($message, $code, $severity, $file, $line);
     }
 
@@ -57,16 +55,15 @@ class CustomException
                 (self::$errors[$exception->getCode()] ?? $exception->getCode()) .
                 " [{$exception->getCode()}]" .
                 '</h1>';
-            echo '<table><tr><td>Класс</td><td><strong>' . get_class($exception) . '</strong></td></tr>';
-            echo '<tr><td>Сообщение</td><td><strong>' . $exception->getMessage() . '</strong></td></tr>';
+            echo '<table><tr><td>Класс</td><td><strong>' . \get_class($exception) . '</strong></td></tr>';
+            echo '<tr><td>Сообщение</td><td>' . $exception->getMessage() . '</td></tr>';
             echo '<tr><td>Файл</td><td><strong>' . $exception->getFile() . '</strong></td></tr>';
             echo '<tr><td>Строка</td><td><strong>' . $exception->getLine() . '</strong></td></tr>';
             // echo '<tr><td>Предыдущий обработчик</td><td><strong>' . $exception->getPrevious() . '</strong></td></tr>';
             echo '<tr><td valign="top">Трассировка</td><td><pre>' . $exception->getTraceAsString() . '</pre></td></tr></table>';
-            // \print_r(['<tr><td valign="top">Трассировка</td><td><pre>', $exception->getTrace(), '</pre></td></tr></table>']);
         } else {
             echo '<h1>Ошибка</h1>';
-            $message = str_repeat("=", 80) . "\n" . \date('Y.m.d H:i:s') . ' => ' . $exception->__toString() . "\n\n";
+            $message = \str_repeat("=", 80) . "\n" . \date('Y.m.d H:i:s') . ' => ' . $exception->__toString() . "\n\n";
             \error_log($message, 3, \ERROR_LOG_FILE);
         }
     }

@@ -8,8 +8,8 @@ use Militer\mvcCore\Http\Response\iResponse;
 
 abstract class aApiController extends aController
 {
-    protected $Request;
-    protected $Response;
+    protected iRequest  $Request;
+    protected iResponse $Response;
 
 
     public function __construct()
@@ -17,22 +17,11 @@ abstract class aApiController extends aController
         parent::__construct();
         $this->Request  = Container::get(iRequest::class);
         $this->Response = Container::get(iResponse::class);
-        // $this->methodVerify();
     }
 
 
     public function index(array $routerData)
     {
-        $method = $routerData['method'];
-        $this->methodVerify($method);
-    }
-
-    protected function sendMessage(string $messages, bool|string $index)
-    {
-        $messages = Container::get('messages', $messages);
-        \is_bool($index)   && $message = $index ? $messages['success'] : $messages['error'];
-        \is_string($index) && $message = $messages[$index];
-        $this->Response->sendJson($message);
     }
 
     protected function csrfVerify(callable $callback)
@@ -127,7 +116,6 @@ abstract class aApiController extends aController
 
     protected function methodVerify(string $method)
     {
-        // $method = $this->Request->getMethod();
         $method !== 'post' && $this->Response->notFoundPage();
     }
 }

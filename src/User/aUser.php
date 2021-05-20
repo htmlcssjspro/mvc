@@ -8,7 +8,7 @@ abstract class aUser extends aModel implements iUser
 {
 
 
-    public function __construct()
+    protected function __construct()
     {
         parent::__construct();
     }

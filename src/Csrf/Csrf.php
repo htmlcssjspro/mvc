@@ -16,7 +16,7 @@ class Csrf implements iCsrf
         $_SESSION['csrf_token']  = \password_hash($_SESSION['csrf_secret'], PASSWORD_DEFAULT);
     }
 
-    public function verify($csrfToken)
+    public function verify(string $csrfToken)
     {
         return \password_verify($_SESSION['csrf_secret'], $csrfToken);
     }

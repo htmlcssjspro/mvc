@@ -2,15 +2,14 @@
 
 namespace Militer\mvcCore\Http\Response;
 
+use Militer\mvcCore\DI\Container;
 
 class Response implements iResponse
 {
     public string $header = '';
     public array  $headers = [];
 
-    public $body     = null;
-    // public $response = null;
-
+    public $body = null;
     public $code = 200;
 
     private $httpStatusCodes = [
@@ -127,36 +126,37 @@ class Response implements iResponse
     public function badRequestMessage()
     {
         $this->code = 400;
-        $response['message'] = 'Bad Request';
+        $this->sendMessage('Bad Request');
+    }
+
+
+    public function sendMessage(string $message)
+    {
+        $response['message'] = $message;
         $this->sendJson($response);
     }
 
-
-    public function sendHtml($html)
+    public function sendResponse(string $response, bool|string $index)
     {
-        $this->header = 'Content-type: text/html;charset=UTF-8';
-        $this->body = $html;
-        $this->send();
+        $response = Container::get('response', $response);
+        \is_bool($index)   && $response = $index ? $response['success'] : $response['error'];
+        \is_string($index) && $response = $response[$index];
+        $this->sendJson($response);
     }
 
-    public function sendText($text)
+    public function sendPage(string $page)
     {
-        $this->header = 'Content-type: text/plain;charset=UTF-8';
-        $this->body = $text;
-        $this->send();
+        $this->sendHtml($page);
     }
 
-    public function sendJson($response)
+    public function sendMain(array $main)
     {
-        $encodeOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE;
-        $json = \json_encode($response, $encodeOptions);
-        $this->header = 'Content-type: application/json';
-        $this->body = $json;
-        $this->send();
+        $this->sendJson($main);
     }
 
-    public function sendMessage(string $message){
-        $response['message'] = $message;
+    public function sendPopup(string $popup)
+    {
+        $response['popup'] = $popup;
         $this->sendJson($response);
     }
 
@@ -166,6 +166,29 @@ class Response implements iResponse
         $this->send();
     }
 
+
+    private function sendHtml(string $html)
+    {
+        $this->header = 'Content-type: text/html; charset=UTF-8';
+        $this->body = $html;
+        $this->send();
+    }
+
+    private function sendText(string $text)
+    {
+        $this->header = 'Content-type: text/plain; charset=UTF-8';
+        $this->body = $text;
+        $this->send();
+    }
+
+    private function sendJson($response)
+    {
+        $encodeOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE;
+        $json = \json_encode($response, $encodeOptions);
+        $this->header = 'Content-type: application/json';
+        $this->body = $json;
+        $this->send();
+    }
 
     private function send()
     {

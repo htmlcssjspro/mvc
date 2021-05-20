@@ -6,14 +6,16 @@ use Militer\mvcCore\DI\Container;
 
 class PDO implements iPDO
 {
-    private static $PDO = null;
-    // private static $dbConfig = [];
+    private static \PDO|null $PDO = null;
 
-    private function __construct()
+
+    public function __construct()
     {
+        self::connect();
     }
 
-    public static function connect()
+
+    private static function connect()
     {
         self::$PDO === null && self::newConnect();
     }
@@ -31,34 +33,47 @@ class PDO implements iPDO
     }
 
 
-    public static function prepFetch(string $sql, string|array $params)
+    private static function prepare(string $sql, array|string $params)
+    {
+        self::connect();
+        $pdostmt = self::$PDO->prepare($sql);
+        \is_string($params) && $params = [$params];
+        // return $pdostmt->execute($params) ? $pdostmt : false;
+        $pdostmt->execute($params);
+        return $pdostmt;
+    }
+    public static function execute(string $sql, array|string $params)
+    {
+        $pdostmt = self::prepare($sql, $params);
+        // return $pdostmt ? true : false;
+        $errorCode = $pdostmt->errorCode();
+        \method();
+        \prd($errorCode, '$errorCode');
+        return $errorCode === '00000' ? true : false;
+    }
+    public static function prepFetch(string $sql, array|string $params)
     {
         $pdostmt = self::prepare($sql, $params);
         return $pdostmt->fetch();
     }
-    public static function prepFetchAll(string $sql, string|array $params)
+    public static function prepFetchAll(string $sql, array|string $params)
     {
         $pdostmt = self::prepare($sql, $params);
         return $pdostmt->fetchAll();
     }
-    public static function prepFetchColumn(string $sql, string|array $params)
+    public static function prepFetchColumn(string $sql, array|string $params)
     {
         $pdostmt = self::prepare($sql, $params);
         return $pdostmt->fetchColumn();
     }
-    private static function prepare(string $sql, string|array $params)
+
+
+    public static function query(string $sql)
     {
         self::connect();
-        $pdostmt = self::$PDO->prepare($sql);
-        if (\is_array($params)){
-            $pdostmt->execute($params);
-        } elseif (\is_string($params)) {
-            $pdostmt->execute([$params]);
-        }
+        $pdostmt = self::$PDO->query($sql);
         return $pdostmt;
     }
-
-
     public static function queryFetch(string $sql)
     {
         $pdostmt = self::query($sql);
@@ -73,11 +88,5 @@ class PDO implements iPDO
     {
         $pdostmt = self::query($sql);
         return $pdostmt->fetchColumn();
-    }
-    private static function query(string $sql)
-    {
-        self::connect();
-        $pdostmt = self::$PDO->query($sql);
-        return $pdostmt;
     }
 }

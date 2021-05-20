@@ -7,7 +7,7 @@ use Militer\mvcCore\Http\Response\iResponse;
 
 class View implements iView
 {
-    private static $Response;
+    private static iResponse $Response;
 
 
     private function __construct()
@@ -24,15 +24,13 @@ class View implements iView
     public static function renderPage($page)
     {
         self::response();
-        self::$Response->body = $page;
-        self::$Response->send();
+        self::$Response->sendPage($page);
     }
 
     public static function renderMain($main)
     {
         self::response();
-        self::$Response->response = $main;
-        self::$Response->sendResponse();
+        self::$Response->sendMain($main);
     }
 
     public static function renderNotFound()

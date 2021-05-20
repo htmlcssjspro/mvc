@@ -29,15 +29,16 @@ class Router implements iRouter
 
         foreach ($routerConfig as $key => $value) {
             $route = $value['route'];
-            if (\preg_match("~^$route~", $requestUri)) {
+            if (\preg_match("~^$route~", $requestUri, $matches)) {
                 $controller = $routerConfig[$key]['controller'];
-                // $routerData['action'] = \preg_replace("~^$route~", '', $requestUri);
+                $routerData['controller'] = \trim($matches[0], '/');
                 $query = \preg_replace("~^$route~", '', $requestUri);
                 $queryArray = \explode('/', $query);
                 $routerData['action'] = \array_shift($queryArray);
                 $routerData['query'] = $queryArray;
             }
         }
+
         $Controller = Container::get($controller);
         $Controller->index($routerData);
     }

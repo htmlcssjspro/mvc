@@ -5,12 +5,12 @@ namespace Militer\mvcCore\Http\Request;
 class Request implements iRequest
 {
 
-    public function getMethod(): String
+    public function getMethod(): string
     {
         return \strtolower($_SERVER['REQUEST_METHOD']);
     }
 
-    public function getUri(): String
+    public function getUri(): string
     {
         return \urldecode($_SERVER['REQUEST_URI']);
     }
@@ -20,7 +20,7 @@ class Request implements iRequest
         return \parse_url(\urldecode($_SERVER['REQUEST_URI']));
     }
 
-    public function getRequestUri(): String
+    public function getRequestUri(): string
     {
         $request = $this->getRequest();
         return $request['path'];

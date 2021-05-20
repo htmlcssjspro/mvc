@@ -6,11 +6,12 @@ use Militer\mvcCore\DI\Container;
 
 class DB implements iDB
 {
-    private static $PDO = null;
+    private static ?\PDO $PDO = null;
 
 
-    private function __construct()
+    public function __construct()
     {
+        // self::connect();
     }
 
 
