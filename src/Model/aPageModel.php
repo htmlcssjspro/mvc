@@ -16,15 +16,12 @@ abstract class aPageModel extends aModel
 
     private string $pageUri;
 
-    private string $layout;
+    private string|false $layout;
+    // private string $layout;
 
     public string $header;
     public string $footer;
     public string $aside;
-
-    public array $headerNav;
-    public array $asideNav;
-    public array $footerNav;
 
     public string $mainContent;
 
@@ -49,8 +46,16 @@ abstract class aPageModel extends aModel
     public function init(string $requestUri)
     {
         $requestUri = \trim($requestUri, '/');
-        $checkPageUri = $this->checkPageUri($requestUri);
-        $checkPageUri ? $this->pageUri = $requestUri : $this->Response->notFound();
+        $this->layout = $this->getLayout($requestUri);
+        // $this->checkPageUri($requestUri);
+        $this->layout
+            ? $this->pageUri = $requestUri
+            : $this->Response->notFound();
+    }
+    private function getLayout(string $requestUri)
+    {
+        $sql = "SELECT `layout` FROM `{$this->sitemapTable}` WHERE `page_uri`=?";
+        return self::$PDO::prepFetchColumn($sql, $requestUri);
     }
     private function checkPageUri(string $requestUri)
     {
@@ -74,41 +79,46 @@ abstract class aPageModel extends aModel
     {
         \extract($this->getLayoutData());
 
-        $this->layout = "{$this->views}/layouts/{$layout}.php";
+        $this->layout = "{$this->views}/layouts/{$this->layout}.php";
 
+        $this->head   = "{$this->views}/components/{$head}.php";
         $this->header = "{$this->views}/components/{$header}.php";
         $this->footer = "{$this->views}/components/{$footer}.php";
         $this->aside  = "{$this->views}/components/{$aside}.php";
 
         $this->mainCSS = "/public/css/{$css}.css";
         $this->mainJS  = "/public/js/{$js}.js";
-
-        $this->headerNav = $this->getHeaderNav();
-        $this->footerNav = $this->getFooterNav();
-        $this->asideNav  = $this->getAsideNav();
     }
     private function getLayoutData()
     {
-        $sql = "SELECT `layout`, `header`, `footer`, `aside`, `css`, `js` FROM `{$this->layoutsTable}` WHERE `current`=1 LIMIT 1";
+        $sql = "SELECT `head`, `header`, `footer`, `aside`, `css`, `js`
+        FROM `{$this->layoutsTable}`
+        WHERE `layout`='{$this->layout}'";
         $layoutData = self::$PDO::queryFetch($sql);
         return $this->escapeOutput($layoutData);
     }
 
     private function getHeaderNav()
     {
-        $sql = "SELECT `label`, `page_uri` FROM `{$this->sitemapTable}` WHERE `header_nav`=1 ORDER by `header_nav_order`";
+        $sql = "SELECT `label`, `page_uri`
+        FROM `{$this->sitemapTable}`
+        WHERE `header_nav`=1 ORDER by `header_nav_order`";
         $headerNav = self::$PDO::queryFetchAll($sql);
         return $this->escapeOutput($headerNav);
     }
     private function getFooterNav()
     {
-        $sql = "SELECT `label`, `page_uri` FROM `{$this->sitemapTable}` WHERE `footer_nav`=1 ORDER by `footer_nav_order`";
+        $sql = "SELECT `label`, `page_uri`
+        FROM `{$this->sitemapTable}`
+        WHERE `footer_nav`=1 ORDER by `footer_nav_order`";
         $footerNav = self::$PDO::queryFetchAll($sql);
         return $this->escapeOutput($footerNav);
     }
     private function getAsideNav()
     {
-        $sql = "SELECT `label`, `page_uri` FROM `{$this->sitemapTable}` WHERE `aside_nav`=1 ORDER by `aside_nav_order`";
+        $sql = "SELECT `label`, `page_uri`
+        FROM `{$this->sitemapTable}`
+        WHERE `aside_nav`=1 ORDER by `aside_nav_order`";
         $asideNav = self::$PDO::queryFetchAll($sql);
         return $this->escapeOutput($asideNav);
     }
@@ -130,12 +140,12 @@ abstract class aPageModel extends aModel
     private function setMainData()
     {
         \extract($this->getMainData());
-        $this->mainContent = "{$this->views}/pages/{$main_content}.php";
+        $this->mainContent = $main_content ? "{$this->views}/pages/{$main_content}.php" : '';
         $this->pageCSS = $page_css ? "/public/css/{$page_css}.css" : '';
         $this->pageJS  = $page_js  ? "/public/js/{$page_js}.js" : '';
-        $this->title       = $title;
-        $this->description = $description;
-        $this->h1          = $h1;
+        $this->title       = $title ?: '';
+        $this->description = $description ?: '';
+        $this->h1          = $h1 ?: '';
     }
     private function getMainData()
     {
@@ -158,6 +168,7 @@ abstract class aPageModel extends aModel
     {
         return Container::get('dictionary', 'user');
     }
+
 
     protected function escapeOutput(array &$data)
     {

@@ -38,17 +38,13 @@ class PDO implements iPDO
         self::connect();
         $pdostmt = self::$PDO->prepare($sql);
         \is_string($params) && $params = [$params];
-        // return $pdostmt->execute($params) ? $pdostmt : false;
         $pdostmt->execute($params);
         return $pdostmt;
     }
     public static function execute(string $sql, array|string $params)
     {
         $pdostmt = self::prepare($sql, $params);
-        // return $pdostmt ? true : false;
         $errorCode = $pdostmt->errorCode();
-        \method();
-        \prd($errorCode, '$errorCode');
         return $errorCode === '00000' ? true : false;
     }
     public static function prepFetch(string $sql, array|string $params)
@@ -66,9 +62,14 @@ class PDO implements iPDO
         $pdostmt = self::prepare($sql, $params);
         return $pdostmt->fetchColumn();
     }
+    public static function prepPdostmt(string $sql, array|string $params)
+    {
+        $pdostmt = self::prepare($sql, $params);
+        return $pdostmt;
+    }
 
 
-    public static function query(string $sql)
+    private static function query(string $sql)
     {
         self::connect();
         $pdostmt = self::$PDO->query($sql);

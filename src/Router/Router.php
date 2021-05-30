@@ -34,7 +34,8 @@ class Router implements iRouter
                 // $routerData['action'] = \preg_replace("~^$route~", '', $requestUri);
                 $query = \preg_replace("~^$route~", '', $requestUri);
                 $queryArray = \explode('/', $query);
-                $routerData['action'] = \array_shift($queryArray);
+                $action = \array_shift($queryArray);
+                $routerData['action'] = \lcfirst(\str_replace('-', '', \ucwords($action, '-')));
                 $routerData['query'] = $queryArray;
             }
         }

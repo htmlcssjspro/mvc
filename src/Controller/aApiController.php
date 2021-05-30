@@ -5,11 +5,13 @@ namespace Militer\mvcCore\Controller;
 use Militer\mvcCore\DI\Container;
 use Militer\mvcCore\Http\Request\iRequest;
 use Militer\mvcCore\Http\Response\iResponse;
+use Militer\mvcCore\User\iUser;
 
 abstract class aApiController extends aController
 {
     protected iRequest  $Request;
     protected iResponse $Response;
+    protected iUser $User;
 
 
     public function __construct()
@@ -17,6 +19,7 @@ abstract class aApiController extends aController
         parent::__construct();
         $this->Request  = Container::get(iRequest::class);
         $this->Response = Container::get(iResponse::class);
+        $this->User     = Container::get(iUser::class);
     }
 
 
