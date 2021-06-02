@@ -15,4 +15,7 @@ interface iUser
     public function register(array $registerData);
     public function accessRestoreRequest(array $accessRestoreData);
     public function accessRestore(array $accessRestoreData);
+
+
+    public function test();
 }
