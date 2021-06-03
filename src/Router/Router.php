@@ -16,8 +16,8 @@ class Router implements iRouter
 
     public static function init()
     {
-        $Request  = Container::get(iRequest::class);
-        $routerConfig = Container::get('config', 'router');
+        $Request = Container::get(iRequest::class);
+        $routes  = Container::get('routes');
 
         $method     = $Request->getMethod();
         $requestUri = $Request->getRequestUri();
@@ -27,12 +27,12 @@ class Router implements iRouter
             'requestUri' => $requestUri,
         ];
 
-        foreach ($routerConfig as $key => $value) {
+        foreach ($routes as $name => $value) {
             $route = $value['route'];
-            if (\preg_match("~^$route~", $requestUri)) {
-                $controller = $routerConfig[$key]['controller'];
-                // $routerData['action'] = \preg_replace("~^$route~", '', $requestUri);
-                $query = \preg_replace("~^$route~", '', $requestUri);
+            $pattern = "~^$route~";
+            if (\preg_match($pattern, $requestUri)) {
+                $controller = $routes[$name]['controller'];
+                $query = \preg_replace($pattern, '', $requestUri);
                 $queryArray = \explode('/', $query);
                 $action = \array_shift($queryArray);
                 $routerData['action'] = \lcfirst(\str_replace('-', '', \ucwords($action, '-')));
