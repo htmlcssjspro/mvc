@@ -184,8 +184,12 @@ abstract class aUser extends aModel implements iUser
         $sql = "UPDATE {$this->usersTable} SET `restore_password`='{$passwordHash}' WHERE `email`=?";
         return self::$PDO::execute($sql, $email);
     }
-    private function sendRestoreEmail(string $email, string $password): bool
+    private function sendRestoreEmail(array $restoreData): bool
     {
+        $restoreData['emailFile'] = \MAIN_VIEWS . '/email/restoreEmail.php';
+        return $this->sendEmail($restoreData);
+
+
         $subject = 'Восстановление доступа';
         \ob_start();
         require Container::get('config', 'restoreEmail');
@@ -326,14 +330,10 @@ abstract class aUser extends aModel implements iUser
     }
     private function sendNewAdminEmail(array $newAdminData)
     {
-        \extract($newAdminData);
-        $emailFile = \ADMIN_VIEWS . '/email/newAdmin.php';
-        $action = 'admin/api/activate-admin';
-        $href = 'admin/activate-admin';
-        $subject = 'Доступ к панели администратора';
-        $from = 'noreply@htmlcssjs.pro';
-        $emailData = \compact('email', 'name', 'emailFile', 'action', 'href', 'password', 'subject', 'from');
-        return $this->sendEmail($emailData);
+        // \extract($newAdminData);
+        $newAdminData['emailFile'] = \ADMIN_VIEWS . '/email/newAdmin.php';
+        // $emailData = \compact('email', 'name', 'emailFile', 'password');
+        return $this->sendEmail($newAdminData);
     }
 
 
@@ -363,7 +363,8 @@ abstract class aUser extends aModel implements iUser
         ];
         $symbols = '!@$%^&?*()';
         $password = '';
-        function random($string){
+        function random($string)
+        {
             return $string[\random_int(0, \mb_strlen($string) - 1)];
         }
         foreach ($charsArr as $chars) {
@@ -388,8 +389,11 @@ abstract class aUser extends aModel implements iUser
     {
         \extract($emailData);
         $url = "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}";
-        $action && $action = "{$url}/{$action}";
-        $href && $href = "{$url}/{$href}";
+        !empty($action) && $action = "{$url}/{$action}";
+        !empty($href) && $href = "{$url}/{$href}";
+        $getEmail = fn(string $name) => Container::get('email', $name);
+        $getAction = fn (string $action) => "{$url}/{$action}";
+        $getHref = fn (string $href) => "{$url}/{$href}";
         \ob_start();
         require $emailFile;
         $message = \ob_get_clean();

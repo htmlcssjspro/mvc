@@ -19,7 +19,6 @@ class PDO implements iPDO
     {
         self::$PDO === null && self::newConnect();
     }
-
     private static function newConnect()
     {
         $dbConfig = Container::get('dbConfig');
