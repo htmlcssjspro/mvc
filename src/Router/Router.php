@@ -17,7 +17,8 @@ class Router implements iRouter
     public static function init()
     {
         $Request = Container::get(iRequest::class);
-        $routes  = Container::get('routes');
+        // $routes  = Container::get('routes');
+        $routes  = Container::get('config', 'routes');
 
         $method     = $Request->getMethod();
         $requestUri = $Request->getRequestUri();

@@ -186,21 +186,8 @@ abstract class aUser extends aModel implements iUser
     }
     private function sendRestoreEmail(array $restoreData): bool
     {
-        $restoreData['emailFile'] = \MAIN_VIEWS . '/email/restoreEmail.php';
+        $restoreData['emailFile'] = Container::get('config', 'emailBody', 'restoreEmail');
         return $this->sendEmail($restoreData);
-
-
-        $subject = 'Восстановление доступа';
-        \ob_start();
-        require Container::get('config', 'restoreEmail');
-        $message = \ob_get_clean();
-        $additional_headers = [
-            'MIME-Version' => '1.0',
-            'Content-type' => 'text/html; charset=UTF-8',
-            'From'         => Container::get('config', 'email')['noreply'],
-        ];
-
-        return \mail($email, $subject, $message, $additional_headers);
     }
 
     public function accessRestore(array $accessRestoreData)
@@ -330,9 +317,7 @@ abstract class aUser extends aModel implements iUser
     }
     private function sendNewAdminEmail(array $newAdminData)
     {
-        // \extract($newAdminData);
-        $newAdminData['emailFile'] = \ADMIN_VIEWS . '/email/newAdmin.php';
-        // $emailData = \compact('email', 'name', 'emailFile', 'password');
+        $newAdminData['emailFile'] = Container::get('config', 'emailBody', 'newAdmin');
         return $this->sendEmail($newAdminData);
     }
 
@@ -391,7 +376,7 @@ abstract class aUser extends aModel implements iUser
         $url = "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}";
         !empty($action) && $action = "{$url}/{$action}";
         !empty($href) && $href = "{$url}/{$href}";
-        $getEmail = fn(string $name) => Container::get('email', $name);
+        $getEmail = fn(string $name) => Container::get('config','email', $name);
         $getAction = fn (string $action) => "{$url}/{$action}";
         $getHref = fn (string $href) => "{$url}/{$href}";
         \ob_start();

@@ -30,12 +30,12 @@ class Container implements iContainer
         }
     }
 
-    public static function get($name, $parameter = NULL)
+    public static function get($name, $param1 = null, $param2 = null)
     {
         !isset(self::$container[$name]) && self::set($name);
         $concrete = self::$container[$name];
         if ($concrete instanceof \Closure) {
-            return $parameter ? $concrete($parameter) : $concrete();
+            return $concrete($param1, $param2);
         }
         return self::resolve($concrete);
     }
