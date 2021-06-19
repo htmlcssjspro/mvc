@@ -20,5 +20,4 @@ abstract class aPageController extends aController
         $method === 'get'  && $this->Model->renderPage();
         $method === 'post' && $this->Model->renderMain();
     }
-
 }

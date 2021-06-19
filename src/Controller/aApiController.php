@@ -23,8 +23,12 @@ abstract class aApiController extends aController
     }
 
 
-    public function index(array $routerData)
+    abstract public function index(array $routerData);
+
+
+    protected function methodVerify(string $method)
     {
+        $method !== 'post' && $this->Response->notFoundPage();
     }
 
     protected function csrfVerify(callable $callback)
@@ -115,10 +119,5 @@ abstract class aApiController extends aController
             }
         }
         return $reFiles;
-    }
-
-    protected function methodVerify(string $method)
-    {
-        $method !== 'post' && $this->Response->notFoundPage();
     }
 }

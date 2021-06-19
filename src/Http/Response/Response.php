@@ -12,6 +12,9 @@ class Response implements iResponse
     public $body = null;
     public $code = 200;
 
+    // private string $ROOT = \ROOT;
+    private string $ROOT;
+
     private $httpStatusCodes = [
         100 => "Continue",
         101 => "Switching Protocols",
@@ -89,9 +92,15 @@ class Response implements iResponse
     ];
 
 
+    public function __construct()
+    {
+        $this->ROOT = "{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}";
+    }
+
+
     public function homePage()
     {
-        $this->header = "Location: {$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}/";
+        $this->header = "Location: {$this->ROOT}/";
         $this->send();
     }
 
@@ -105,7 +114,7 @@ class Response implements iResponse
     public function notFoundPage()
     {
         $this->code = 404;
-        $this->header = "Location: {$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}/404";
+        $this->header = "Location: {$this->ROOT}/404";
         $this->send();
     }
 
@@ -119,7 +128,7 @@ class Response implements iResponse
     public function badRequestPage()
     {
         $this->code = 400;
-        $this->header = "Location: {$_SERVER['REQUEST_SCHEME']}://{$_SERVER['SERVER_NAME']}/400";
+        $this->header = "Location: {$this->ROOT}/400";
         $this->send();
     }
 
