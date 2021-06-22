@@ -14,7 +14,6 @@ interface iUser
     public function adminLogout();
     public function adminPasswordChange(array $adminPasswordChangeData);
     public function addAdmin(array $newAdminData);
-    public function activateAdmin(array $adminActivationData);
 
 
     public function test();

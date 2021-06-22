@@ -3,9 +3,11 @@
 namespace Militer\mvcCore\Controller;
 
 use Militer\mvcCore\Controller\aApiController;
+use Militer\mvcCore\Model\iAdminApiModel;
 
 abstract class aAdminApiController extends aApiController
 {
+    public iAdminApiModel $Model;
 
 
     public function __construct()
@@ -36,14 +38,6 @@ abstract class aAdminApiController extends aApiController
         $this->User->adminLogout();
     }
 
-
-    public function preferences()
-    {
-        $this->csrfVerify(function ($preferencesData) {
-            $this->Model->preferences($preferencesData);
-        });
-    }
-
     public function adminPasswordChange()
     {
         $this->csrfVerify(function ($adminPasswordChangeData) {
@@ -58,10 +52,33 @@ abstract class aAdminApiController extends aApiController
         });
     }
 
-    public function adminActivation()
+    public function updateMainSitemap()
     {
-        $this->csrfVerify(function ($adminActivationData) {
-            $this->User->activateAdmin($adminActivationData);
+        $this->csrfVerify(function ($sitemapData) {
+            $this->Model->updateMainSitemap($sitemapData);
         });
     }
+    public function updateAdminSitemap()
+    {
+        $this->csrfVerify(function ($sitemapData) {
+            $this->Model->updateAdminSitemap($sitemapData);
+        });
+    }
+
+    public function preferences()
+    {
+        $this->csrfVerify(function ($preferencesData) {
+            $this->Model->preferences($preferencesData);
+        });
+    }
+
+
+
+
+    // public function adminActivation()
+    // {
+    //     $this->csrfVerify(function ($adminActivationData) {
+    //         $this->User->activateAdmin($adminActivationData);
+    //     });
+    // }
 }

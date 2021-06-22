@@ -35,18 +35,46 @@ abstract class aAdminModel extends aPageModel
         return self::$PDO::queryFetchAll($sql);
     }
 
-    protected function getPagesData()
+
+    protected function getMainPageListData()
     {
         $table = self::MAIN_SITEMAP_TABLE;
+        return $this->getPageListData($table);
+    }
+    protected function getAdminPageListData()
+    {
+        $table = self::ADMIN_SITEMAP_TABLE;
+        return $this->getPageListData($table);
+    }
+    private function getPageListData(string $table)
+    {
         $sql = "SELECT
                 `label`,
                 `page_uri`,
                 `title`,
                 `description`,
-                `h1`
+                `h1`,
+                `main`,
+                `layout`
             FROM `{$table}`
             WHERE `admin`=1";
         return self::$PDO::queryFetchAll($sql);
+    }
+
+    public function getMainLayoutList()
+    {
+        $table = self::MAIN_LAYOUTS_TABLE;
+        return $this->getLayoutList($table);
+    }
+    public function getAdminLayoutList()
+    {
+        $table = self::ADMIN_LAYOUTS_TABLE;
+        return $this->getLayoutList($table);
+    }
+    private function getLayoutList(string $table)
+    {
+        $sql = "SELECT `layout` FROM `{$table}`";
+        return self::$PDO::queryFetchAllColumn($sql);
     }
 
 

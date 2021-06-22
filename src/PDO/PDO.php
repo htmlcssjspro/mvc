@@ -32,7 +32,7 @@ class PDO implements iPDO
     }
 
 
-    private static function prepare(string $sql, array|string $params)
+    public static function prepare(string $sql, array|string $params)
     {
         self::connect();
         $pdostmt = self::$PDO->prepare($sql);
@@ -51,24 +51,34 @@ class PDO implements iPDO
         $pdostmt = self::prepare($sql, $params);
         return $pdostmt->fetch();
     }
-    public static function prepFetchAll(string $sql, array|string $params)
-    {
-        $pdostmt = self::prepare($sql, $params);
-        return $pdostmt->fetchAll();
-    }
     public static function prepFetchColumn(string $sql, array|string $params)
     {
         $pdostmt = self::prepare($sql, $params);
         return $pdostmt->fetchColumn();
     }
-    public static function prepPdostmt(string $sql, array|string $params)
+    public static function prepFetchAll(string $sql, array|string $params)
     {
         $pdostmt = self::prepare($sql, $params);
-        return $pdostmt;
+        return $pdostmt->fetchAll();
+    }
+    public static function prepFetchAllColumn(string $sql, array|string $params, int $colNo = 0)
+    {
+        $pdostmt = self::prepare($sql, $params);
+        return $pdostmt->fetchAll(\PDO::FETCH_COLUMN, $colNo);
+    }
+    public static function prepFetchAllColumnGroup(string $sql, array|string $params, int $colNo = 0)
+    {
+        $pdostmt = self::prepare($sql, $params);
+        return $pdostmt->fetchAll(\PDO::FETCH_COLUMN | \PDO::FETCH_GROUP, $colNo);
+    }
+    public static function prepFetchAllKeyPare(string $sql, array|string $params)
+    {
+        $pdostmt = self::prepare($sql, $params);
+        return $pdostmt->fetchAll(\PDO::FETCH_KEY_PAIR);
     }
 
 
-    private static function query(string $sql)
+    public static function query(string $sql)
     {
         self::connect();
         $pdostmt = self::$PDO->query($sql);
@@ -79,14 +89,29 @@ class PDO implements iPDO
         $pdostmt = self::query($sql);
         return $pdostmt->fetch();
     }
+    public static function queryFetchColumn(string $sql)
+    {
+        $pdostmt = self::query($sql);
+        return $pdostmt->fetchColumn();
+    }
     public static function queryFetchAll(string $sql)
     {
         $pdostmt = self::query($sql);
         return $pdostmt->fetchAll();
     }
-    public static function queryFetchColumn(string $sql)
+    public static function queryFetchAllColumn(string $sql, int $colNo = 0)
     {
         $pdostmt = self::query($sql);
-        return $pdostmt->fetchColumn();
+        return $pdostmt->fetchAll(\PDO::FETCH_COLUMN, $colNo);
+    }
+    public static function queryFetchAllColumnGroup(string $sql, int $colNo = 0)
+    {
+        $pdostmt = self::query($sql);
+        return $pdostmt->fetchAll(\PDO::FETCH_COLUMN | \PDO::FETCH_GROUP, $colNo);
+    }
+    public static function queryFetchAllKeyPare(string $sql, int $colNo = 0)
+    {
+        $pdostmt = self::query($sql);
+        return $pdostmt->fetchAll(\PDO::FETCH_KEY_PAIR, $colNo);
     }
 }

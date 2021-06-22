@@ -2,10 +2,6 @@
 
 namespace Militer\mvcCore\Model;
 
-use Militer\mvcCore\DI\Container;
-use Militer\mvcCore\Http\Request\iRequest;
-use Militer\mvcCore\Http\Response\iResponse;
-
 abstract class aApiModel extends aModel
 {
     protected string $popupsTable;
