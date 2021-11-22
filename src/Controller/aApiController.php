@@ -2,12 +2,13 @@
 
 namespace Militer\mvcCore\Controller;
 
+use Militer\mvcCore\Controller\interfaces\iApiController;
 use Militer\mvcCore\DI\Container;
 use Militer\mvcCore\Http\Request\iRequest;
 use Militer\mvcCore\Http\Response\iResponse;
 use Militer\mvcCore\User\iUser;
 
-abstract class aApiController extends aController
+abstract class aApiController extends aController implements iApiController
 {
     protected iRequest  $Request;
     protected iResponse $Response;
@@ -23,7 +24,21 @@ abstract class aApiController extends aController
     }
 
 
-    abstract public function index(array $routerData);
+    public function index(array $routerData)
+    {
+        \extract($routerData);
+        $this->methodVerify($method);
+        \method_exists($this, $action)
+            ? $this->$action($query)
+            : $this->Response->badRequestMessage();
+    }
+
+
+    public function popup(array $query)
+    {
+        $popup = $query[0];
+        $this->Model->renderPopup($popup);
+    }
 
 
     protected function methodVerify(string $method)

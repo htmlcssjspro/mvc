@@ -1,6 +1,6 @@
 <?php
 
-namespace Militer\mvcCore\Model;
+namespace Militer\mvcCore\Model\interfaces;
 
 interface iAdminApiModel extends iApiModel
 {
@@ -8,6 +8,6 @@ interface iAdminApiModel extends iApiModel
     public function updateMainSitemap(array $sitemapData);
     public function updateAdminSitemap(array $sitemapData);
 
-
-    public function test();
+    public function addMainNewPage(array $mainNewPageData);
+    public function addAdminNewPage(array $adminNewPageData);
 }

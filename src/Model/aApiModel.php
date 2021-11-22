@@ -2,9 +2,11 @@
 
 namespace Militer\mvcCore\Model;
 
-abstract class aApiModel extends aModel
+use Militer\mvcCore\Model\interfaces\iApiModel;
+
+abstract class aApiModel extends aModel implements iApiModel
 {
-    protected string $popupsTable;
+    // protected string $popupsTable;
     protected string $views;
 
 
@@ -14,7 +16,7 @@ abstract class aApiModel extends aModel
     }
 
 
-    protected function renderPopup(string $popup)
+    public function renderPopup(string $popup)
     {
         // $popupFile = $this->getPopup($popup);
         $popup = \lcfirst(\str_replace('-', '', \ucwords($popup, '-')));

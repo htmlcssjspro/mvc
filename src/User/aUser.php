@@ -48,19 +48,19 @@ abstract class aUser extends aModel implements iUser
         $this->status  = $status;
         $this->balance = $balance;
     }
-    private function getUserData()
-    {
-        $sql = "SELECT `username`, `status`, `balance`
-            FROM {$this->usersTable}
-            WHERE `user_uuid`=?";
-        return self::$PDO::prepFetch($sql, $this->uuid);
-    }
     private function updateUserLastVisit()
     {
         $sql = "UPDATE {$this->usersTable}
             SET `last_visit`=CURRENT_DATE()
             WHERE `user_uuid`=?";
         self::$PDO::execute($sql, $this->uuid);
+    }
+    private function getUserData()
+    {
+        $sql = "SELECT `username`, `status`, `balance`
+            FROM {$this->usersTable}
+            WHERE `user_uuid`=?";
+        return self::$PDO::prepFetch($sql, $this->uuid);
     }
 
     private function setAdminData()
@@ -71,19 +71,19 @@ abstract class aUser extends aModel implements iUser
         $this->adminEmail = $email;
         $this->adminStatus = $admin_status;
     }
-    private function getAdminData()
-    {
-        $sql = "SELECT `name`, `email`, `admin_status`
-            FROM `{$this->adminTable}`
-            WHERE `admin_uuid`=?";
-        return self::$PDO::prepFetch($sql, $this->adminUuid);
-    }
     private function updateAdminLastVisit()
     {
         $sql = "UPDATE {$this->adminTable}
             SET `last_visit`=CURRENT_DATE()
             WHERE `admin_uuid`=?";
         self::$PDO::execute($sql, $this->adminUuid);
+    }
+    private function getAdminData()
+    {
+        $sql = "SELECT `name`, `email`, `admin_status`
+            FROM `{$this->adminTable}`
+            WHERE `admin_uuid`=?";
+        return self::$PDO::prepFetch($sql, $this->adminUuid);
     }
 
 
@@ -129,7 +129,9 @@ abstract class aUser extends aModel implements iUser
     }
     private function getUserPassword(): string
     {
-        $sql = "SELECT `password` FROM `{$this->usersTable}` WHERE `user_uuid`=?";
+        $sql = "SELECT `password`
+            FROM `{$this->usersTable}`
+            WHERE `user_uuid`=?";
         return self::$PDO::prepFetchColumn($sql, $this->uuid);
     }
     private function updateUserPassword(string $passwordHash): bool
@@ -139,6 +141,7 @@ abstract class aUser extends aModel implements iUser
             WHERE `user_uuid`=?";
         return self::$PDO::execute($sql, $this->userUuid);
     }
+
 
     public function register(array $registerData)
     {
@@ -182,6 +185,7 @@ abstract class aUser extends aModel implements iUser
         ];
         return self::$PDO::execute($sql, $params);
     }
+
 
     public function accessRestoreRequest(array $accessRestoreData)
     {
@@ -232,7 +236,9 @@ abstract class aUser extends aModel implements iUser
     private function updatePasswordHash(string $email, string $passwordHash): bool
     {
         $sql = "UPDATE {$this->usersTable}
-            SET `password`='{$passwordHash}', `restore_password`=NULL
+            SET
+                `password`='{$passwordHash}',
+                `restore_password`=NULL
             WHERE `email`=?";
         return self::$PDO::execute($sql, $email);
     }
@@ -357,6 +363,12 @@ abstract class aUser extends aModel implements iUser
     }
 
 
+    public function superadmin()
+    {
+        return $this->status === 'superadmin';
+    }
+
+
     // public function activateAdmin(array $adminActivationData)
     // {
     //     \extract($adminActivationData);
@@ -430,5 +442,10 @@ abstract class aUser extends aModel implements iUser
     {
         $sql = "SELECT 1 FROM `{$table}` WHERE `email`=?";
         return self::$PDO::prepFetchColumn($sql, $email);
+    }
+
+
+    public function test()
+    {
     }
 }

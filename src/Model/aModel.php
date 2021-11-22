@@ -4,6 +4,7 @@ namespace Militer\mvcCore\Model;
 
 use Militer\mvcCore\DI\Container;
 use Militer\mvcCore\Http\Response\iResponse;
+use Militer\mvcCore\Model\interfaces\iModel;
 use Militer\mvcCore\PDO\iPDO;
 
 abstract class aModel implements iModel
@@ -12,10 +13,10 @@ abstract class aModel implements iModel
 
     protected iResponse $Response;
 
-    protected const MAIN_SITEMAP_TABLE   = 'main_sitemap';
-    protected const MAIN_LAYOUTS_TABLE   = 'main_layouts';
-    protected const MAIN_SECTIONS_TABLE  = 'main_sections';
-    protected const MAIN_POPUPS_TABLE    = 'main_popups';
+    protected const MAIN_SITEMAP_TABLE     = 'main_sitemap';
+    protected const MAIN_LAYOUTS_TABLE     = 'main_layouts';
+    protected const MAIN_SECTIONS_TABLE    = 'main_sections';
+    protected const MAIN_POPUPS_TABLE      = 'main_popups';
 
     protected const ADMIN_SITEMAP_TABLE  = 'admin_sitemap';
     protected const ADMIN_LAYOUTS_TABLE  = 'admin_layouts';
@@ -24,6 +25,8 @@ abstract class aModel implements iModel
     protected const ADMIN_TABLE          = 'admin';
 
     protected const USERS_TABLE          = 'users';
+
+    protected string $preferencesTable = 'preferences';
 
 
     protected function __construct()

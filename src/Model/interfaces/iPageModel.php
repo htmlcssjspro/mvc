@@ -1,6 +1,6 @@
 <?php
 
-namespace Militer\mvcCore\Model;
+namespace Militer\mvcCore\Model\interfaces;
 
 interface iPageModel
 {

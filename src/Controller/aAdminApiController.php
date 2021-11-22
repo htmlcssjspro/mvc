@@ -3,7 +3,7 @@
 namespace Militer\mvcCore\Controller;
 
 use Militer\mvcCore\Controller\aApiController;
-use Militer\mvcCore\Model\iAdminApiModel;
+use Militer\mvcCore\Model\interfaces\iAdminApiModel;
 
 abstract class aAdminApiController extends aApiController
 {
@@ -13,16 +13,6 @@ abstract class aAdminApiController extends aApiController
     public function __construct()
     {
         parent::__construct();
-    }
-
-
-    public function index(array $routerData)
-    {
-        \extract($routerData);
-        $this->methodVerify($method);
-        \method_exists($this, $action)
-            ? $this->$action($query)
-            : $this->Response->badRequestMessage();
     }
 
 
@@ -65,15 +55,28 @@ abstract class aAdminApiController extends aApiController
         });
     }
 
-    public function preferences()
+    public function addMainNewPage()
     {
-        $this->csrfVerify(function ($preferencesData) {
-            $this->Model->preferences($preferencesData);
+        $this->csrfVerify(function ($mainNewPageData) {
+            $this->Model->addMainNewPage($mainNewPageData);
+        });
+    }
+    public function addAdminNewPage()
+    {
+        $this->csrfVerify(function ($adminNewPageData) {
+            $this->Model->addAdminNewPage($adminNewPageData);
         });
     }
 
 
 
+
+    // public function preferences()
+    // {
+    //     $this->csrfVerify(function ($preferencesData) {
+    //         $this->Model->preferences($preferencesData);
+    //     });
+    // }
 
     // public function adminActivation()
     // {

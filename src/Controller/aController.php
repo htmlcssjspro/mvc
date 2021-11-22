@@ -2,6 +2,7 @@
 
 namespace Militer\mvcCore\Controller;
 
+use Militer\mvcCore\Controller\interfaces\iController;
 use Militer\mvcCore\Csrf\iCsrf;
 use Militer\mvcCore\DI\Container;
 

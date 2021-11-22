@@ -3,9 +3,11 @@
 namespace Militer\mvcCore\Controller;
 
 use Militer\mvcCore\Controller\aApiController;
+use Militer\mvcCore\Model\interfaces\iMainApiModel;
 
 abstract class aMainApiController extends aApiController
 {
+    public iMainApiModel $Model;
 
 
     public function __construct()
@@ -13,15 +15,6 @@ abstract class aMainApiController extends aApiController
         parent::__construct();
     }
 
-
-    public function index(array $routerData)
-    {
-        \extract($routerData);
-        $this->methodVerify($method);
-        \method_exists($this, $action)
-            ? $this->$action($query)
-            : $this->Response->badRequestMessage();
-    }
 
     public function login()
     {
@@ -57,11 +50,7 @@ abstract class aMainApiController extends aApiController
     }
 
 
-    public function popup(array $query)
-    {
-        $popup = $query[0];
-        $this->Model->popup($popup);
-    }
+
 
 
 

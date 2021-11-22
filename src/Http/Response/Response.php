@@ -139,6 +139,13 @@ class Response implements iResponse
     }
 
 
+    // public function sendInputError(string $input, string $error)
+    // {
+    //     $response['inputName'] = $input;
+    //     $response['inputError'] = $error;
+    //     $this->sendJson($response);
+    // }
+
     public function sendMessage(string $message)
     {
         $response['message'] = $message;

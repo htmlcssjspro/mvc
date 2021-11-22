@@ -3,9 +3,12 @@
 namespace Militer\mvcCore\Model;
 
 use Militer\mvcCore\Model\aPageModel;
+use Militer\mvcCore\Model\traits\tAdminModel;
 
 abstract class aAdminModel extends aPageModel
 {
+    use tAdminModel;
+
     private const ADMIN_LOGIN_URI      = '/admin/login';
     private const ADMIN_ACTIVATION_URI = '/admin/admin-activation';
 
@@ -61,21 +64,21 @@ abstract class aAdminModel extends aPageModel
         return self::$PDO::queryFetchAll($sql);
     }
 
-    public function getMainLayoutList()
-    {
-        $table = self::MAIN_LAYOUTS_TABLE;
-        return $this->getLayoutList($table);
-    }
-    public function getAdminLayoutList()
-    {
-        $table = self::ADMIN_LAYOUTS_TABLE;
-        return $this->getLayoutList($table);
-    }
-    private function getLayoutList(string $table)
-    {
-        $sql = "SELECT `layout` FROM `{$table}`";
-        return self::$PDO::queryFetchAllColumn($sql);
-    }
+    // public function getMainLayoutList()
+    // {
+    //     $table = self::MAIN_LAYOUTS_TABLE;
+    //     return $this->getLayoutList($table);
+    // }
+    // public function getAdminLayoutList()
+    // {
+    //     $table = self::ADMIN_LAYOUTS_TABLE;
+    //     return $this->getLayoutList($table);
+    // }
+    // private function getLayoutList(string $table)
+    // {
+    //     $sql = "SELECT `layout` FROM `{$table}`";
+    //     return self::$PDO::queryFetchAllColumn($sql);
+    // }
 
 
     protected function getUsersList()
@@ -118,7 +121,6 @@ abstract class aAdminModel extends aPageModel
         !isset($_SESSION['admin_uuid'])
             && $this->renderLoginPage(self::ADMIN_LOGIN_URI);
     }
-
     protected function renderLoginPage(string $uri)
     {
         parent::init($uri);

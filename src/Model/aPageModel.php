@@ -3,6 +3,7 @@
 namespace Militer\mvcCore\Model;
 
 use Militer\mvcCore\DI\Container;
+use Militer\mvcCore\Model\interfaces\iPageModel;
 use Militer\mvcCore\User\iUser;
 
 abstract class aPageModel extends aModel implements iPageModel
@@ -47,23 +48,15 @@ abstract class aPageModel extends aModel implements iPageModel
     public function init(string $requestUri): void
     {
         $requestUri = \trim($requestUri, '/');
-        $this->layout = $this->getLayout($requestUri);
-        // $this->checkPageUri($requestUri);
-        $this->layout
+        $this->checkPageUri($requestUri)
             ? $this->pageUri = $requestUri
             : $this->Response->notFound();
     }
-    private function getLayout(string $requestUri)
-    {
-        $sql = "SELECT `layout` FROM `{$this->sitemapTable}` WHERE `page_uri`=?";
-        return self::$PDO::prepFetchColumn($sql, $requestUri);
-    }
-    private function checkPageUri(string $requestUri)
+    private function checkPageUri(string $requestUri): bool
     {
         $sql = "SELECT 1 FROM `{$this->sitemapTable}` WHERE `page_uri`=?";
         return self::$PDO::prepFetchColumn($sql, $requestUri);
     }
-
 
     public function renderPage()
     {
@@ -73,15 +66,15 @@ abstract class aPageModel extends aModel implements iPageModel
         \ob_start();
         \file_exists($this->layout)
             ? require $this->layout
-            : "<!-- {$this->layout} file not found -->";
+            : "<!-- File {$this->layout} not found -->";
         $page = \ob_get_clean();
         $this->Response->sendPage($page);
     }
-    private function setLayoutData()
+    private function setLayoutData(): void
     {
         \extract($this->getLayoutData());
 
-        $this->layout = "{$this->views}/layouts/{$this->layout}.php";
+        $this->layout = "{$this->views}/layouts/{$layout}.php";
 
         $this->head   = $head;
         $this->header = $header;
@@ -91,12 +84,12 @@ abstract class aPageModel extends aModel implements iPageModel
         $this->layoutCSS = $css;
         $this->layoutJS  = $js;
     }
-    private function getLayoutData()
+    private function getLayoutData(): array
     {
-        $sql = "SELECT `head`, `header`, `footer`, `aside`, `css`, `js`
+        $sql = "SELECT `layout`, `head`, `header`, `footer`, `aside`, `css`, `js`
             FROM `{$this->layoutsTable}`
-            WHERE `layout`=?";
-        $layoutData = self::$PDO::prepFetch($sql, $this->layout);
+            WHERE `current`=1";
+        $layoutData = self::$PDO::queryFetch($sql);
         return $this->escapeOutput($layoutData);
     }
 
@@ -116,6 +109,7 @@ abstract class aPageModel extends aModel implements iPageModel
     private function setMainData()
     {
         \extract($this->getMainData());
+
         $this->mainContent = $main;
         $this->mainCSS = $css;
         $this->mainJS  = $js;
@@ -133,33 +127,53 @@ abstract class aPageModel extends aModel implements iPageModel
 
 
     //*************************************************************************
-    //***** Layout Data
+    //***** Layout & Page Data
     //*************************************************************************
 
-    protected function getComponent(string $name)
-    {
-        $component = "{$this->views}/components/{$this->$name}.php";
-        return \file_exists($component)
-            ? require $component
-            : "<!-- {$component} file not found -->";
-    }
     protected function getMainContent()
     {
         $mainContent = "{$this->views}/pages/{$this->mainContent}.php";
         return \file_exists($mainContent)
             ? require $mainContent
-            : "<!-- {$mainContent} file not found -->";
+            : "<!-- File {$mainContent} not found -->";
     }
 
-    protected function getCSS(string $css, bool $preload = false)
+    protected function getHead(): string
     {
-        $css = \CSS . "/{$css}.css";
-        return \file_exists(\_ROOT_ . $css)
-            ? ($preload
-                ? "<link rel=\"preload\" href=\"{$css}\" as=\"stylesheet\">"
-                : "<link rel=\"stylesheet\" href=\"{$css}\">")
-            : "<!-- {$css} file not found -->";
+        return $this->getComponent('head');
     }
+    protected function getHeader(): string
+    {
+        return $this->getComponent('header');
+    }
+    protected function getFooter(): string
+    {
+        return $this->getComponent('footer');
+    }
+    protected function getAside(): string
+    {
+        return $this->getComponent('aside');
+    }
+    protected function getComponent(string $name): string
+    {
+        $name = $this->$name ?: $name;
+        $component = "{$this->views}/components/{$name}.php";
+        return \file_exists($component)
+            ? require $component
+            : "<!-- File {$component} not found -->";
+    }
+    protected function getSection(string $section): string
+    {
+        // $sql = "SELECT `file` FROM `{$this->sectionsTable}` WHERE `name`='{$section}'";
+        // $sectionFile = self::$PDO::queryFetchColumn($sql);
+        // $sectionFile = "{$this->views}/sections/{$sectionFile}.php";
+        $section = "{$this->views}/sections/{$section}.php";
+        return \file_exists($section)
+            ? require $section
+            : "<!-- File {$section} not found -->";
+    }
+
+
     protected function getLayoutCSS(bool $preload = false)
     {
         return $this->getCSS($this->layoutCSS, $preload);
@@ -168,16 +182,18 @@ abstract class aPageModel extends aModel implements iPageModel
     {
         return $this->getCSS($this->mainCSS, $preload);
     }
-
-    protected function getJS(string $js, bool $preload = false)
+    protected function getCSS(string $css, bool $preload = false)
     {
-        $js = \JS . "/{$js}.js";
-        return \file_exists(\_ROOT_ . $js)
+        $css = \CSS . "/{$css}.css";
+        return \file_exists(\_ROOT_ . $css)
+            // ? '<link rel="' . ($preload ? 'preload' : 'stylesheet') . " href=\"{$css}\"" . ($preload ? ' as="stylesheet">' : '')
             ? ($preload
-                ? "<link rel=\"preload\" href=\"{$js}\" as=\"script\">"
-                : "<script defer src=\"{$js}\"></script>")
-            : "<!-- {$js} file not found -->";
+                ? "<link rel=\"preload\" href=\"{$css}\" as=\"stylesheet\">"
+                : "<link rel=\"stylesheet\" href=\"{$css}\">")
+            : "<!-- File {$css} not found -->";
     }
+
+
     protected function getLayoutJS(bool $preload = false)
     {
         return $this->getJS($this->layoutJS, $preload);
@@ -186,48 +202,47 @@ abstract class aPageModel extends aModel implements iPageModel
     {
         return $this->getJS($this->mainJS, $preload);
     }
+    protected function getJS(string $js, bool $preload = false)
+    {
+        $js = \JS . "/{$js}.js";
+        return \file_exists(\_ROOT_ . $js)
+            ? ($preload
+                ? "<link rel=\"preload\" href=\"{$js}\" as=\"script\">"
+                : "<script defer src=\"{$js}\"></script>")
+            : "<!-- File {$js} not found -->";
+    }
 
 
-    //*************************************************************************
-    //***** Page Data
-    //*************************************************************************
-
-    protected function getHeaderNav()
+    protected function getHeaderNav(): array
     {
         $sql = "SELECT `label`, `page_uri`
             FROM `{$this->sitemapTable}`
-            WHERE `header_nav`=1 ORDER by `header_nav_order`";
-        $headerNav = self::$PDO::queryFetchAll($sql);
-        return $this->escapeOutput($headerNav);
+            WHERE `header_nav`=1
+            ORDER by `header_nav_order`";
+        return $this->getNav($sql);
     }
-    protected function getFooterNav()
+    protected function getFooterNav(): array
     {
         $sql = "SELECT `label`, `page_uri`
             FROM `{$this->sitemapTable}`
-            WHERE `footer_nav`=1 ORDER by `footer_nav_order`";
-        $footerNav = self::$PDO::queryFetchAll($sql);
-        return $this->escapeOutput($footerNav);
+            WHERE `footer_nav`=1
+            ORDER by `footer_nav_order`";
+        return $this->getNav($sql);
     }
-    protected function getAsideNav()
+    protected function getAsideNav(): array
     {
         $sql = "SELECT `label`, `page_uri`
             FROM `{$this->sitemapTable}`
-            WHERE `aside_nav`=1 ORDER by `aside_nav_order`";
-        $asideNav = self::$PDO::queryFetchAll($sql);
-        return $this->escapeOutput($asideNav);
+            WHERE `aside_nav`=1
+            ORDER by `aside_nav_order`";
+        return $this->getNav($sql);
     }
-
-
-    protected function getSection(string $section)
+    private function getNav(string $sql): array
     {
-        // $sql = "SELECT `file` FROM `{$this->sectionsTable}` WHERE `name`='{$section}'";
-        // $sectionFile = self::$PDO::queryFetchColumn($sql);
-        // $sectionFile = "{$this->views}/sections/{$sectionFile}.php";
-        $section = "{$this->views}/sections/{$section}.php";
-        return \file_exists($section)
-            ? require $section
-            : "<!-- {$section} file not found -->";
+        $nav = self::$PDO::queryFetchAll($sql);
+        return $this->escapeOutput($nav);
     }
+
 
     protected function getDictionary()
     {

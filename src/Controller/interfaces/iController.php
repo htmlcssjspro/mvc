@@ -1,6 +1,6 @@
 <?php
 
-namespace Militer\mvcCore\Controller;
+namespace Militer\mvcCore\Controller\interfaces;
 
 interface iController
 {
